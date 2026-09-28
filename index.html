@@ -6,171 +6,159 @@
 <style>
     body {
         background-color: #f4f6f8;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         display: flex;
         justify-content: center;
         padding: 40px;
+        margin: 0;
     }
     .canvas {
         position: relative;
         width: 1100px;
         height: 750px;
         background-color: #ffffff;
-        border: 1px solid #e1e4e8;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #d1d5da;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
-    /* 节点基础样式 */
-    .node {
-        position: absolute;
-        width: 160px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 500;
-        text-align: center;
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        z-index: 2;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
-    /* Google 节点 */
-    .g-node {
-        background-color: #e8f0fe;
-        border: 1.5px solid #1a73e8;
-        color: #174ea6;
-    }
-    /* GitHub 节点 */
-    .gh-node {
-        background-color: #f6f8fa;
-        border: 1.5px solid #24292e;
-        color: #24292e;
-    }
-    /* 文件夹节点 */
-    .folder-node {
-        background-color: #f6f8fa;
-        border: 1.5px dashed #6a737d;
-        color: #24292e;
-    }
-    /* 黄色高亮框 (Manual Test & Github PAT) */
-    .yellow-node {
-        background-color: #fff9c4;
-        border: 1.5px solid #fbc02d;
-        color: #b7791f;
-        box-shadow: 0 0 0 3px rgba(251, 192, 45, 0.2);
-    }
-    /* SVG 线条层 */
-    .lines {
+    svg {
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
         z-index: 1;
-        pointer-events: none;
     }
-    /* 标签样式 */
+    .node {
+        position: absolute;
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        z-index: 2;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.3;
+    }
+    .g-node { background-color: #e8f0fe; border: 1.5px solid #1a73e8; color: #174ea6; }
+    .gh-node { background-color: #f6f8fa; border: 1.5px solid #24292e; color: #24292e; }
+    .folder-node { background-color: #ffffff; border: 1.5px dashed #6a737d; color: #586069; }
+    .yellow-node { background-color: #fff9c4; border: 1.5px solid #fbc02d; color: #b7791f; box-shadow: 0 0 0 3px rgba(251, 192, 45, 0.2); }
     .label {
         position: absolute;
         font-size: 11px;
         color: #586069;
-        background: rgba(255, 255, 255, 0.9);
+        background: #ffffff;
         padding: 2px 6px;
         border-radius: 4px;
+        border: 1px solid #d1d5da;
         z-index: 3;
-        border: 1px solid #e1e4e8;
         white-space: nowrap;
+    }
+    .divider {
+        position: absolute;
+        left: 550px; top: 20px; bottom: 20px;
+        border-left: 2px dashed #d1d5da;
+        z-index: 0;
     }
 </style>
 </head>
 <body>
-
 <div class="canvas">
-    <!-- SVG 绘制所有连线 -->
-    <svg class="lines">
+    <div class="divider"></div>
+
+    <!-- SVG 连线层：路径是绝对写死的，绝不交叉 -->
+    <svg>
         <defs>
-            <!-- 实线箭头 -->
             <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a737d" />
             </marker>
-            <!-- 虚线箭头 (黄色) -->
             <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#fbc02d" />
             </marker>
         </defs>
 
-        <!-- ================= Google 内部连线 ================= -->
-        <path d="M 130 90 L 130 110" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 130 150 L 130 170" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 130 210 L 130 230" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 130 270 L 130 290" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 130 330 L 130 470" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 130 510 L 130 530" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <!-- ===== Google 内部连线 ===== -->
+        <path d="M 250 70 L 250 90" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 250 130 L 250 150" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
         
-        <path d="M 210 490 L 270 490 L 270 530" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-        <path d="M 230 550 L 210 550" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <!-- 左边分支 (X=120) -->
+        <path d="M 250 190 L 120 190 L 120 230" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <path d="M 120 270 L 120 300" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 120 340 L 120 370" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 120 410 L 120 450" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 120 490 L 190 490 L 190 450" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" /> <!-- Related Doc 去 Client Email -->
 
-        <!-- Create Project 到 Paste GAS Code 和 Properties Service -->
-        <path d="M 210 190 L 270 190 L 270 230" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-        <path d="M 210 190 L 240 190 L 240 80 L 550 80 L 550 620" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <!-- 右边分支 (X=380) -->
+        <path d="M 250 190 L 380 190 L 380 230" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <path d="M 380 270 L 380 300" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
         
-        <path d="M 320 270 L 320 290" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 320 270 L 320 620" stroke="#fbc02d" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-yellow)" />
+        <!-- Manual Test 虚线连接 (行为标识) -->
+        <path d="M 380 340 L 380 550" stroke="#fbc02d" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-yellow)" />
 
-        <!-- ================= GitHub 内部连线 ================= -->
-        <path d="M 850 90 L 850 110" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 850 150 L 850 170" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 850 210 L 850 250 L 930 250" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <!-- Google Properties Service (X=250, Y=550) 来自 Create Project -->
+        <path d="M 250 190 L 250 550" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- ===== GitHub 内部连线 ===== -->
+        <path d="M 850 70 L 850 90" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
         
-        <path d="M 1010 270 L 1010 430" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
-
-        <path d="M 850 150 L 850 470" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-        <path d="M 850 150 L 850 620" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-
-        <!-- ================= 跨区连线（绝对平行，绝不交叉） ================= -->
-        <!-- 左上 -> 右上：JSON 密钥存入 Github Secret -->
-        <path d="M 210 490 L 840 490" stroke="#6a737d" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)" />
+        <!-- 左边分支 (X=650, Github Secret) -->
+        <path d="M 850 130 L 650 130 L 650 370" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
         
-        <!-- 右下 -> 左下：Github PAT 放入 Google Properties Service -->
-        <path d="M 840 640 L 620 640" stroke="#6a737d" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)" />
+        <!-- 右边分支 (X=980) -->
+        <path d="M 850 130 L 980 130 L 980 190" stroke="#6a737d" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <path d="M 980 230 L 980 270" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 980 310 L 980 350" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 980 390 L 980 430" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Github PAT (X=850, Y=550) 源自 Repository -->
+        <path d="M 850 130 L 850 550" stroke="#6a737d" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- ===== 跨区连线（绝对平行，绝不交叉） ===== -->
+        <!-- 1. 左上 -> 右上 (Y=370) -->
+        <path d="M 190 390 L 640 390" stroke="#6a737d" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)" />
+        <!-- 2. 右下 -> 左下 (Y=570) -->
+        <path d="M 840 570 L 310 570" stroke="#6a737d" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)" />
     </svg>
 
-    <!-- ================= 左侧：Google 节点 ================= -->
-    <div class="node g-node" style="left: 50px; top: 50px;">Google</div>
-    <div class="node g-node" style="left: 50px; top: 110px;">Console</div>
-    <div class="node g-node" style="left: 50px; top: 170px;">Create Project</div>
-    <div class="node g-node" style="left: 50px; top: 230px;">Activate GS/GD api</div>
-    <div class="node g-node" style="left: 50px; top: 290px;">Create Service Account</div>
-    <div class="node g-node" style="left: 50px; top: 470px;">Auto Download JSON<br>as secret key</div>
-    <div class="node g-node" style="left: 50px; top: 530px;">In JSON client email</div>
-    <div class="node g-node" style="left: 250px; top: 530px;">Share Related Doc</div>
+    <!-- ================= 左侧：Google ================= -->
+    <div class="node g-node" style="left: 200px; top: 40px; width: 100px;">Google</div>
+    <div class="node g-node" style="left: 200px; top: 100px; width: 100px;">Console</div>
+    <div class="node g-node" style="left: 180px; top: 160px; width: 140px;">Create Project</div>
     
-    <div class="node g-node" style="left: 250px; top: 230px;">Paste GAS Code</div>
-    <div class="node g-node" style="left: 250px; top: 290px;">Set up Trigger</div>
-    <div class="node yellow-node" style="left: 250px; top: 620px;">Manual Test</div>
-    
-    <div class="node g-node" style="left: 470px; top: 620px;">Google Properties<br>Service</div>
+    <div class="node g-node" style="left: 50px; top: 240px; width: 140px;">Activate GS/GD api</div>
+    <div class="node g-node" style="left: 50px; top: 310px; width: 140px;">Credential:<br>Create Service Account</div>
+    <div class="node g-node" style="left: 50px; top: 380px; width: 140px;">Auto Download JSON<br>as secret key</div>
+    <div class="node g-node" style="left: 50px; top: 460px; width: 140px;">In JSON client email</div>
+    <div class="node g-node" style="left: 50px; top: 520px; width: 140px;">Share Related Doc</div>
 
-    <!-- ================= 右侧：GitHub 节点 ================= -->
-    <div class="node gh-node" style="left: 770px; top: 50px;">GitHub</div>
-    <div class="node gh-node" style="left: 770px; top: 110px;">Create Github<br>Repository</div>
-    <div class="node gh-node" style="left: 770px; top: 170px;">Create 4 Folder</div>
-    
-    <div class="node folder-node" style="left: 930px; top: 230px;">Workflow.yml</div>
-    <div class="node folder-node" style="left: 930px; top: 290px;">requirement.txt</div>
-    <div class="node folder-node" style="left: 930px; top: 350px;">scripts/main.py</div>
-    <div class="node folder-node" style="left: 930px; top: 410px;">scripts/sheets_client.py</div>
-    
-    <div class="node gh-node" style="left: 770px; top: 470px;">Github Secret</div>
-    <div class="node yellow-node" style="left: 770px; top: 620px;">Github PAT<br>(Fine-grained)</div>
+    <div class="node g-node" style="left: 310px; top: 240px; width: 140px;">Paste GAS Code</div>
+    <div class="node g-node" style="left: 310px; top: 310px; width: 140px;">Set up Trigger</div>
+    <div class="node yellow-node" style="left: 310px; top: 560px; width: 140px;">Manual Test</div>
 
-    <!-- ================= 文字标注 ================= -->
-    <div class="label" style="left: 480px; top: 470px;">put into</div>
-    <div class="label" style="left: 700px; top: 620px;">放置 PAT</div>
-    <div class="label" style="left: 370px; top: 560px;">行为标识</div>
-    <div class="label" style="left: 120px; top: 510px;">授权共享</div>
+    <div class="node g-node" style="left: 180px; top: 560px; width: 140px;">Google Properties<br>Service</div>
+
+    <!-- ================= 右侧：GitHub ================= -->
+    <div class="node gh-node" style="left: 800px; top: 40px; width: 100px;">GitHub</div>
+    <div class="node gh-node" style="left: 760px; top: 100px; width: 180px;">Create Github Repository</div>
+
+    <div class="node gh-node" style="left: 580px; top: 380px; width: 140px;">Github Secret</div>
+    <div class="node gh-node" style="left: 760px; top: 160px; width: 180px;">Create 4 Folder</div>
+
+    <div class="node folder-node" style="left: 910px; top: 200px; width: 140px;">Workflow.yml</div>
+    <div class="node folder-node" style="left: 910px; top: 280px; width: 140px;">requirement.txt</div>
+    <div class="node folder-node" style="left: 910px; top: 360px; width: 140px;">scripts/main.py</div>
+    <div class="node folder-node" style="left: 910px; top: 440px; width: 140px;">scripts/sheets_client.py</div>
+
+    <div class="node yellow-node" style="left: 780px; top: 560px; width: 140px;">Github PAT<br>(Fine-grained)</div>
+
+    <!-- ================= 标注 ================= -->
+    <div class="label" style="left: 380px; top: 370px;">put into</div>
+    <div class="label" style="left: 560px; top: 550px;">放置 PAT</div>
+    <div class="label" style="left: 420px; top: 440px;">行为标识</div>
+    <div class="label" style="left: 120px; top: 495px;">授权共享</div>
 </div>
-
 </body>
 </html>
