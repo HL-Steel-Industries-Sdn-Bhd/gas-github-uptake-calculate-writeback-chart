@@ -5,8 +5,8 @@
 <title>自动化数据流水线架构图</title>
 <style>
     body {
-        background-color: #f4f6f8;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f0f2f5;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         display: flex;
         justify-content: center;
         padding: 40px;
@@ -14,42 +14,53 @@
     }
     .canvas {
         position: relative;
-        width: 1150px;
-        height: 800px;
+        width: 1200px;
+        height: 840px;
         background-color: #ffffff;
         border: 1px solid #d1d5da;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
     }
-    /* SVG 线条层，绝对在最底层 */
+    /* 中间分割线 */
+    .divider {
+        position: absolute;
+        left: 600px; top: 0; bottom: 0;
+        border-left: 2px dashed #d1d5da;
+        z-index: 0;
+    }
+    /* SVG 线条层 */
     svg {
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
         z-index: 1;
+        pointer-events: none;
     }
-    /* 节点层 */
+    /* 节点基础样式 */
     .node {
         position: absolute;
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 500;
         text-align: center;
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         z-index: 2;
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
         line-height: 1.4;
+        transition: all 0.2s;
     }
     /* 颜色定义 */
-    .g-node { background-color: #4285F4; border: 2px solid #fff; color: #ffffff; }
-    .gh-node { background-color: #24292F; border: 2px solid #fff; color: #ffffff; }
-    .folder-node { background-color: #F1F8FF; border: 2px dashed #2088FF; color: #0366d6; }
-    .yellow-node { background-color: #fffbe6; border: 2px solid #faad14; color: #d48806; box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.2); }
+    .g-node { background-color: #4285F4; border: 2px solid #ffffff; color: #ffffff; }
+    .gh-node { background-color: #24292F; border: 2px solid #ffffff; color: #ffffff; }
+    .folder-node { background-color: #F1F8FF; border: 2px dashed #2088FF; color: #0366d6; font-size: 12px;}
+    .yellow-node { background-color: #fffbe6; border: 2px solid #faad14; color: #d48806; box-shadow: 0 0 0 3px rgba(250, 173, 20, 0.15); }
     
+    /* 标注 */
     .label {
         position: absolute;
         font-size: 11px;
@@ -61,111 +72,114 @@
         z-index: 3;
         white-space: nowrap;
     }
-    .divider {
-        position: absolute;
-        left: 575px; top: 20px; bottom: 20px;
-        border-left: 2px dashed #d1d5da;
-        z-index: 0;
-    }
 </style>
 </head>
 <body>
 <div class="canvas">
     <div class="divider"></div>
 
-    <!-- SVG 连线层：坐标硬编码，绝对不交叉 -->
+    <!-- ================= 连线层 ================= -->
     <svg>
         <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#586069" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e" />
             </marker>
             <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#faad14" />
             </marker>
+            <marker id="arrow-gray-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e" />
+            </marker>
         </defs>
 
-        <!-- ================= Google 内部连线 ================= -->
-        <!-- 主链条：Google -> Console -> Project -> ... -> JSON -> Client email -->
-        <path d="M 230 70 L 230 90" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 230 130 L 230 150" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 230 190 L 230 210" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 230 250 L 230 270" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 230 310 L 230 330" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
+        <!-- ================= 左侧：Google 内部连线 ================= -->
+        <!-- 主干：Google -> Console -> Project -->
+        <path d="M 180 70 L 180 90" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 180 130 L 180 150" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
         
-        <!-- G6 (JSON) 向下到 G7 (Client email)，同时 G8 (Related Doc) 向左指向 G7 -->
-        <path d="M 230 410 L 230 430" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 370 450 L 310 450" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
+        <!-- Project -> Activate API (左侧主线) -->
+        <path d="M 180 190 L 180 210" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 180 250 L 180 280" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 180 320 L 180 350" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- In JSON client email (180, 390) 和 Share Related Doc (340, 390) 互相指向 -->
+        <path d="M 260 390 L 280 390" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- 跨区线1：JSON 密钥存入 Github Secret (从 260,390 水平向右拉到 580, 390) -->
+        <path d="M 260 390 L 580 390" stroke="#8b949e" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-gray-dash)" />
 
-        <!-- Project 分支：Paste GAS Code & Properties Service -->
-        <path d="M 310 170 L 370 170 L 370 210" stroke="#586069" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-        <path d="M 310 170 L 450 170 L 450 470" stroke="#586069" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <!-- Project -> Paste GAS Code (中间支线) -->
+        <path d="M 180 190 L 400 190 L 400 210" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <path d="M 400 250 L 400 280" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
         
-        <!-- GAS -> Trigger -->
-        <path d="M 370 250 L 370 270" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        
-        <!-- GAS 虚线指向 Manual Test (行为标识) -->
-        <path d="M 370 250 L 370 650" stroke="#faad14" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-yellow)" />
+        <!-- GAS -> Manual Test (行为标识虚线) -->
+        <path d="M 400 250 L 400 740" stroke="#faad14" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-yellow)" />
 
-        <!-- ================= GitHub 内部连线 ================= -->
-        <path d="M 920 70 L 920 90" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        
-        <!-- GH2 分支：Secret (左上) -->
-        <path d="M 850 150 L 750 150 L 750 350" stroke="#586069" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-        
-        <!-- GH2 分支：Create 4 Folder -->
-        <path d="M 990 150 L 1060 150 L 1060 190" stroke="#586069" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-        <path d="M 1060 230 L 1060 270" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 1060 310 L 1060 350" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
-        <path d="M 1060 390 L 1060 430" stroke="#586069" stroke-width="2" marker-end="url(#arrow)" />
+        <!-- Project -> Google Properties Service (右侧支线) -->
+        <path d="M 180 190 L 520 190 L 520 630" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)" />
 
-        <!-- GH2 分支：PAT (右下) -->
-        <path d="M 990 150 L 990 650" stroke="#586069" stroke-width="2" fill="none" marker-end="url(#arrow)" />
-
-        <!-- ================= 跨区连线（绝对平行，绝对不交叉） ================= -->
-        <!-- 1. 左上 -> 右上：JSON 存入 Github Secret -->
-        <path d="M 310 390 L 670 390" stroke="#586069" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)" />
+        <!-- ================= 右侧：GitHub 内部连线 ================= -->
+        <!-- 主干：GitHub -> Repository -->
+        <path d="M 950 70 L 950 90" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
         
-        <!-- 2. 右下 -> 左下：Github PAT 放入 Google Properties Service -->
-        <path d="M 910 680 L 540 680" stroke="#586069" stroke-width="2" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)" />
+        <!-- Repository -> Github Secret (顶部左侧) -->
+        <path d="M 950 130 L 700 130 L 700 350" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        
+        <!-- Repository -> Create 4 Folder (中间支线) -->
+        <path d="M 950 130 L 1080 130 L 1080 210" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+        <path d="M 1080 250 L 1080 280" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 1080 320 L 1080 350" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 1080 390 L 1080 420" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+        <path d="M 1080 460 L 1080 490" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Repository -> Github PAT (底部右侧支线) -->
+        <path d="M 950 130 L 950 740" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+
+        <!-- 跨区线2：Github PAT 放入 Google Properties Service (从 850, 740 水平向左拉到 620, 740) -->
+        <path d="M 850 740 L 620 740" stroke="#8b949e" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-gray-dash)" />
+
     </svg>
 
     <!-- ================= 左侧：Google 节点 ================= -->
-    <div class="node g-node" style="left: 180px; top: 40px; width: 100px;">Google</div>
-    <div class="node g-node" style="left: 180px; top: 100px; width: 100px;">Console 控制台</div>
-    <div class="node g-node" style="left: 160px; top: 160px; width: 140px;">Create Project 创建项目</div>
+    <div class="node g-node" style="left: 130px; top: 40px; width: 100px; height: 40px;">Google</div>
+    <div class="node g-node" style="left: 130px; top: 100px; width: 100px; height: 40px;">Console 控制台</div>
+    <div class="node g-node" style="left: 110px; top: 160px; width: 140px; height: 40px;">Create Project</div>
     
-    <div class="node g-node" style="left: 160px; top: 220px; width: 140px;">Activate GS/GD api</div>
-    <div class="node g-node" style="left: 140px; top: 280px; width: 180px;">Credential: Create Service Account</div>
-    <div class="node g-node" style="left: 140px; top: 340px; width: 180px;">Auto Download JSON as secret key</div>
-    <div class="node g-node" style="left: 140px; top: 420px; width: 180px;">In JSON client email</div>
-    <div class="node g-node" style="left: 300px; top: 420px; width: 140px;">Share Related Doc</div>
+    <div class="node g-node" style="left: 110px; top: 220px; width: 140px; height: 40px;">Activate GS/GD api</div>
+    <div class="node g-node" style="left: 90px; top: 280px; width: 180px; height: 40px;">Credential: Create Service Account</div>
+    <div class="node g-node" style="left: 90px; top: 350px; width: 180px; height: 40px;">Auto Download JSON</div>
+    <div class="node g-node" style="left: 90px; top: 430px; width: 180px; height: 40px;">In JSON client email</div>
+    <div class="node g-node" style="left: 280px; top: 430px; width: 160px; height: 40px;">Share Related Doc</div>
 
-    <div class="node g-node" style="left: 300px; top: 220px; width: 140px;">Paste GAS Code</div>
-    <div class="node g-node" style="left: 300px; top: 280px; width: 140px;">Set up Trigger</div>
-    <div class="node yellow-node" style="left: 300px; top: 670px; width: 140px;">Manual Test 标识</div>
+    <div class="node g-node" style="left: 330px; top: 220px; width: 140px; height: 40px;">Paste GAS Code</div>
+    <div class="node g-node" style="left: 330px; top: 280px; width: 140px; height: 40px;">Set up Trigger</div>
+    
+    <!-- 左侧底部的黄框 -->
+    <div class="node yellow-node" style="left: 330px; top: 720px; width: 140px; height: 40px;">Manual Test 标识</div>
 
-    <div class="node g-node" style="left: 370px; top: 470px; width: 160px;">Google Properties Service</div>
+    <div class="node g-node" style="left: 440px; top: 630px; width: 160px; height: 40px;">Google Properties Service</div>
 
     <!-- ================= 右侧：GitHub 节点 ================= -->
-    <div class="node gh-node" style="left: 870px; top: 40px; width: 100px;">GitHub</div>
-    <div class="node gh-node" style="left: 810px; top: 100px; width: 220px;">Create Github Repository 创建仓库</div>
+    <div class="node gh-node" style="left: 900px; top: 40px; width: 100px; height: 40px;">GitHub</div>
+    <div class="node gh-node" style="left: 870px; top: 100px; width: 160px; height: 40px;">Create Github Repository</div>
 
-    <div class="node gh-node" style="left: 680px; top: 360px; width: 140px;">Github Secret 仓库密钥</div>
-    
-    <div class="node gh-node" style="left: 990px; top: 160px; width: 140px;">Create 4 Folder 创建目录</div>
-    <div class="node folder-node" style="left: 990px; top: 240px; width: 140px;">Workflow.yml</div>
-    <div class="node folder-node" style="left: 990px; top: 320px; width: 140px;">requirement.txt</div>
-    <div class="node folder-node" style="left: 990px; top: 400px; width: 140px;">scripts/main.py</div>
-    <div class="node folder-node" style="left: 990px; top: 480px; width: 140px;">scripts/sheets_client.py</div>
+    <div class="node gh-node" style="left: 620px; top: 350px; width: 160px; height: 40px;">Github Secret</div>
 
-    <div class="node yellow-node" style="left: 920px; top: 670px; width: 200px;">Github PAT: read & write on selected</div>
+    <div class="node gh-node" style="left: 1010px; top: 220px; width: 140px; height: 40px;">Create 4 Folder</div>
+    <div class="node folder-node" style="left: 1010px; top: 290px; width: 140px; height: 40px;">Workflow.yml</div>
+    <div class="node folder-node" style="left: 1010px; top: 350px; width: 140px; height: 40px;">requirement.txt</div>
+    <div class="node folder-node" style="left: 1010px; top: 420px; width: 140px; height: 40px;">main.py</div>
+    <div class="node folder-node" style="left: 1010px; top: 490px; width: 140px; height: 40px;">sheets_client.py</div>
 
-    <!-- ================= 文字标注 ================= -->
-    <div class="label" style="left: 440px; top: 370px;">put into</div>
-    <div class="label" style="left: 650px; top: 660px;">放置 PAT</div>
-    <div class="label" style="left: 380px; top: 540px;">行为标识</div>
-    <div class="label" style="left: 230px; top: 440px;">授权共享</div>
-    <div class="label" style="left: 780px; top: 130px;">Fine-grained 仅限该仓库</div>
+    <!-- 右侧底部的黄框 (与 Manual Test 严格同高) -->
+    <div class="node yellow-node" style="left: 850px; top: 720px; width: 200px; height: 40px;">Github PAT: read & write</div>
+
+    <!-- ================= 标签 ================= -->
+    <div class="label" style="left: 400px; top: 370px;">put into</div>
+    <div class="label" style="left: 700px; top: 720px;">放置 PAT</div>
+    <div class="label" style="left: 450px; top: 580px;">行为标识</div>
+    <div class="label" style="left: 240px; top: 410px;">授权</div>
+    <div class="label" style="left: 780px; top: 110px;">Fine-grained 仅限该仓库</div>
 </div>
 </body>
 </html>
